@@ -1,34 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:reto_sqlflite/pages/register_page.dart';
-
-import '../controller/login_controller.dart';
-import '../model/enum_model.dart';
+import 'package:reto_sqlflite/controller/register_controller.dart';
+import 'package:reto_sqlflite/model/enum_model.dart';
+import 'package:reto_sqlflite/pages/login_page.dart';
 
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({key}) : super(key: key);
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({Key? key}) : super(key: key);
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
-  final LoginController _loginController = LoginController();
-   
+class _RegisterPageState extends State<RegisterPage> {
+  final RegisterController _registerController = RegisterController();
+
   @override
   void initState() {
     super.initState();
-     _loginController.emailController =  TextEditingController();
-     _loginController.passwordController =  TextEditingController();
   }
 
   @override
   void dispose() {
-    
-    _loginController.emailController = TextEditingController();
-     _loginController.passwordController = TextEditingController();
-     super.dispose();
+    _registerController.nameController.dispose();
+    _registerController.lastNameController.dispose();
+    _registerController.emailController.dispose();
+    _registerController.passwordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -71,7 +68,7 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       const Center(
                         child: Text(
-                          "Inicio de Sesión",
+                          "Registrar usuario",
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 30),
                         ),
@@ -85,52 +82,76 @@ class _LoginPageState extends State<LoginPage> {
                         height: h * 0.01,
                       ),
                       Form(
-                        key: _loginController.formKey,
+                        key: _registerController.formKey,
                         child: ListView(
                           shrinkWrap: true,
                           children: [
                             TextFormField(
-                              controller: _loginController.emailController,
+                              controller: _registerController.nameController,
                               decoration: const InputDecoration(
                                 prefixIcon: Icon(Icons.person),
-                                hintText: "Digite su correo",
-                                labelText: "Correo",
+                                hintText: "Digite su nombre",
+                                labelText: "Nombre",
                                 border: OutlineInputBorder(),
                               ),
                               autovalidateMode:
                                   AutovalidateMode.onUserInteraction,
                               onEditingComplete: null,
-                              validator: (String? value) => _loginController
-                                  .validator(value, InputType.email),
+                              validator: (String? value) =>
+                                  _registerController.validator(value, InputType.name),
                             ),
                             SizedBox(
                               height: h * 0.03,
                             ),
                             TextFormField(
-                              controller: _loginController.passwordController,
-                              decoration: InputDecoration(
-                                prefixIcon: const Icon(Icons.lock),
-                                hintText: "Digite su contraseña",
-                                labelText: "Contraseña",
-                                border: const OutlineInputBorder(),
-                                suffixIcon: IconButton(
-                                  onPressed: () => {
-                                    _loginController.changeVisible(),
-                                    setState(() {}),
-                                  },
-                                  icon: Icon(
-                                    _loginController.visiblePassword
-                                        ? FontAwesomeIcons.eyeSlash
-                                        : FontAwesomeIcons.eye,
-                                  ),
-                                ),
+                              controller:
+                                  _registerController.lastNameController,
+                              decoration: const InputDecoration(
+                                prefixIcon: Icon(Icons.person),
+                                hintText: "Digite su apellido",
+                                labelText: "Apellido",
+                                border: OutlineInputBorder(),
                               ),
                               autovalidateMode:
                                   AutovalidateMode.onUserInteraction,
                               onEditingComplete: null,
-                              validator: (String? value) => _loginController
-                                  .validator(value, InputType.password),
-                              obscureText: _loginController.visiblePassword,
+                              validator: (String? value) =>
+                                  _registerController.validator(value, InputType.lastName),
+                            ),
+                            SizedBox(
+                              height: h * 0.03,
+                            ),
+                            TextFormField(
+                              controller: _registerController.emailController,
+                              decoration: const InputDecoration(
+                                prefixIcon: Icon(Icons.person),
+                                hintText: "Digite su correo electrónico",
+                                labelText: "Correo electrónico",
+                                border: OutlineInputBorder(),
+                              ),
+                              autovalidateMode:
+                                  AutovalidateMode.onUserInteraction,
+                              onEditingComplete: null,
+                              validator: (String? value) =>
+                                  _registerController.validator(value, InputType.email),
+                            ),
+                            SizedBox(
+                              height: h * 0.03,
+                            ),
+                            TextFormField(
+                              controller:
+                                  _registerController.passwordController,
+                              decoration: const InputDecoration(
+                                prefixIcon: Icon(Icons.lock_outline_rounded),
+                                hintText: "Digite su contraseña",
+                                labelText: "Contraseña",
+                                border: OutlineInputBorder(),
+                              ),
+                              autovalidateMode:
+                                  AutovalidateMode.onUserInteraction,
+                              onEditingComplete: null,
+                              validator: (String? value) =>
+                                  _registerController.validator(value, InputType.password),
                             ),
                           ],
                         ),
@@ -141,16 +162,32 @@ class _LoginPageState extends State<LoginPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          const Expanded(
-                            child: InkWell(
-                              onTap: null,
-                              child: Text(
-                                "¿Olvidadó su contraseña?",
-                                style: TextStyle(
-                                  color: Colors.blue,
-                                  fontSize: 14,
-                                  decoration: TextDecoration.underline,
+                          SizedBox(
+                            width: w * 0.35,
+                            height: h * 0.05,
+                            child: ElevatedButton.icon(
+                              onPressed: () async {
+                                Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                      builder: (context) => const LoginPage()),
+                                );
+                              },
+                              icon: const Icon(
+                                Icons.backup_rounded,
+                                color: Colors.white,
+                              ),
+                              label: const Text(
+                                "Volver",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              style: ButtonStyle(
+                                shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
                                 ),
+                                backgroundColor:
+                                    MaterialStateProperty.all(Colors.blue),
                               ),
                             ),
                           ),
@@ -158,7 +195,9 @@ class _LoginPageState extends State<LoginPage> {
                             width: w * 0.35,
                             height: h * 0.05,
                             child: ElevatedButton.icon(
-                              onPressed: () => _loginController.signIn(context),
+                              onPressed: () async {
+                                await _registerController.register(context);
+                              },
                               icon: const Icon(
                                 Icons.login_rounded,
                                 color: Colors.white,
@@ -180,29 +219,6 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ],
                       ),
-                      SizedBox(
-                        height: h * 0.05,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text("¿No tienes una cuenta?"),
-                          InkWell(
-                            onTap: () => Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                  builder: (context) => const RegisterPage()),
-                            ),
-                            child: const Text(
-                              "Registrate",
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  decoration: TextDecoration.underline,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.blue),
-                            ),
-                          ),
-                        ],
-                      )
                     ],
                   ),
                 ),

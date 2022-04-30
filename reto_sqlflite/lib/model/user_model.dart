@@ -1,5 +1,5 @@
 class UserModel {
-  int id;
+  int? id;
   String email;
   String lastName;
   String password;

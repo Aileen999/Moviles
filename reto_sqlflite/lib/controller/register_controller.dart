@@ -1,18 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:reto_sqlflite/pages/home_pages.dart';
 import 'package:reto_sqlflite/services/database_service.dart';
 
 import '../model/enum_model.dart';
 import '../model/user_model.dart';
-import '../pages/home_pages.dart';
 
-class LoginController {
+class RegisterController {
+  TextEditingController nameController = TextEditingController(text: "");
+  TextEditingController lastNameController = TextEditingController(text: "");
   TextEditingController emailController = TextEditingController(text: "");
   TextEditingController passwordController = TextEditingController(text: "");
   final formKey = GlobalKey<FormState>();
   bool visiblePassword = true;
+
   String? validator(value, InputType inputType) {
-    if (inputType == InputType.email) {
+    if (inputType == InputType.name) {
+      if (value.isEmpty || value == null) {
+        return "El nombre es requerido";
+      }
+    } else if (inputType == InputType.lastName) {
+      if (value.isEmpty || value == null) {
+        return "El apellido es requerido";
+      }
+    } else if (inputType == InputType.email) {
       if (value.isEmpty || value == null) {
         return "El correo es requerido";
       }
@@ -24,19 +35,25 @@ class LoginController {
       if (value.isEmpty || value == null) {
         return "La contraseña es requerida";
       }
+      if (!RegExp(r"^.{6,}$").hasMatch(value)) {
+        return "Debe de tener almenos 6 digitos";
+      }
     }
 
     return null;
   }
 
-  void changeVisible() {
-    visiblePassword = !visiblePassword;
-  }
-
-  Future<void> signIn(BuildContext context) async {
+  Future<void> register(BuildContext context) async {
     if (formKey.currentState!.validate()) {
-      UserModel user = await DatabaseService.userGetByEmailPassword(
-          emailController.value.text, passwordController.value.text);
+      UserModel user = UserModel(
+          null,
+          emailController.value.text,
+          lastNameController.value.text,
+          passwordController.value.text,
+          nameController.value.text,
+          1);
+
+      user.id = await DatabaseService.insert(user);
 
       if (user.id != 0) {
         Navigator.pushReplacement(
@@ -44,7 +61,7 @@ class LoginController {
           MaterialPageRoute(builder: (context) => const HomePage()),
         );
         Fluttertoast.showToast(
-          msg: "Usuario " + user.name + ", accedió con éxito",
+          msg: "Usuario " + user.name + ", registrado con éxito",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.SNACKBAR,
           timeInSecForIosWeb: 1,
@@ -54,7 +71,7 @@ class LoginController {
         );
       } else {
         Fluttertoast.showToast(
-          msg: "Usuario o contraseña incorrectos",
+          msg: "Error al registrar",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.SNACKBAR,
           timeInSecForIosWeb: 1,
@@ -65,14 +82,14 @@ class LoginController {
       }
     } else {
       Fluttertoast.showToast(
-        msg: "Verifique que no hayan errores",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.SNACKBAR,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 12.0,
-      );
+          msg: "Error al registrar, verifique que no hayan errores",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.SNACKBAR,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 12.0,
+        );
     }
   }
 }

@@ -9,7 +9,7 @@ abstract class DatabaseService {
     return openDatabase(join(await getDatabasesPath(), 'sqlite.db'),
         onCreate: (db, version) async {
       await db.execute(
-          "CREATE TABLE user (id INTEGER PRIMARY KEY, email TEXT,password TEXT, name TEXT,state  INTEGER)");
+          "CREATE TABLE user (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT,password TEXT, name TEXT, lastName TEXT,state  INTEGER)");
       await db.execute("CREATE TABLE session (idUser INTEGER)");
       return;
     }, version: 1);

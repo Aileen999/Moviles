@@ -1,8 +1,10 @@
-enum InputType{
-  user,
+enum InputType {
+  email,
+  lastName,
+  name,
   password,
 }
-enum MessageType{
+enum MessageType {
   none,
   success,
   warning,
